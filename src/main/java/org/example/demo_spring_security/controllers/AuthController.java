@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -21,24 +24,33 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody User request) {
+    public ResponseEntity<?> register(@Valid @RequestBody User request) {
         try {
-            authService.register(request);
-            return ResponseEntity.ok("Inscription réussie");
+            User user = authService.register(request);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Inscription réussie",
+                    "username", user.getUsername(),
+                    "roles", user.getRoles()
+            ));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody User request) {
-        boolean isAuthenticated = authService.login(request);
-        if (isAuthenticated) {
-            return ResponseEntity.ok("Connexion réussie");
-        } else {
+    public ResponseEntity<?> login(@Valid @RequestBody User request) {
+        try {
+            User user = authService.login(request);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Connexion réussie",
+                    "username", user.getUsername(),
+                    "roles", user.getRoles().stream()
+                            .map(role -> role.getName().toString())
+                            .collect(Collectors.toList())
+            ));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Nom d'utilisateur ou mot de passe incorrect");
         }
     }
 }
-

@@ -33,11 +33,8 @@ public class User implements UserDetails {
     private String username;
 
     @NotBlank(message = "Le mot de passe est obligatoire")
-    @Size(min = 6, max = 100, message = "Le mot de passe doit contenir entre 6 et 100 caractères")
-    @Pattern(
-            regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$",
-            message = "Le mot de passe doit contenir au moins un chiffre, une minuscule, une majuscule et un caractère spécial"
-    )
+
+
     @Column(nullable = false)
     private String password;
 
@@ -99,7 +96,7 @@ public class User implements UserDetails {
         return username;
     }
 
-    public void setUsername(String username) {git
+    public void setUsername(String username) {
         this.username = username;
     }
 

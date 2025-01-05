@@ -27,12 +27,17 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/public/**", "/auth/**").permitAll()
-                        .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/user/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults())
-                .formLogin(withDefaults())
+                .formLogin(form -> form
+                        .loginPage("/auth/login")
+                        .defaultSuccessUrl("/api/user", true)
+                        .permitAll()
+                )
                 .csrf(csrf -> csrf.disable());
 
         return http.build();
